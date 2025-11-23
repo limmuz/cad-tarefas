@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Tarefa</title>
+    <style>
+        /* --- CSS MANUAL (ESTILO) --- */
+        /* Aqui definimos a aparência de cada classe "entendível" */
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding-bottom: 60px; /* Espaço para o rodapé */
+        }
+
+        .container-principal {
+            width: 90%;
+            max-width: 600px; /* Largura máxima do formulário */
+            margin: 40px auto; /* Centraliza na tela */
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px; /* Bordas arredondadas */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* Sombra suave */
+        }
+
+        .titulo-pagina {
+            text-align: center;
+            color: #333;
+        }
+
+        .grupo-campo {
+            margin-bottom: 15px; /* Espaço entre os campos */
+        }
+
+        .rotulo-campo {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .entrada-dados {
+            width: 100%; /* Ocupa toda a largura disponível */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Garante que o padding não aumente a largura */
+        }
+
+        .mensagem-erro {
+            color: red;
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: none; /* Escondido por padrão */
+        }
+
+        /* Estilo dos Botões */
+        .area-botoes {
+            display: flex;
+            justify-content: space-between; /* Botões afastados */
+            margin-top: 20px;
+        }
+
+        .botao {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none; /* Tira o sublinhado do link */
+            text-align: center;
+        }
+
+        .botao-salvar {
+            background-color: #28a745; /* Verde */
+            color: white;
+        }
+
+        .botao-cancelar {
+            background-color: #6c757d; /* Cinza */
+            color: white;
+        }
+
+        .botao:hover {
+            opacity: 0.9; /* Efeito visual ao passar o mouse */
+        }
+
+        /* Rodapé */
+        .rodape-fixo {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #ddd;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-principal">
+        <h2 class="titulo-pagina" id="tituloTela">Nova Tarefa</h2>
+
+        <form id="formularioTarefa">
+            <div class="grupo-campo">
+                <label for="titulo" class="rotulo-campo">Título da Tarefa *</label>
+                <input type="text" id="titulo" class="entrada-dados" placeholder="Ex: Estudar Spring Boot">
+                <div id="erro-titulo" class="mensagem-erro"></div>
+            </div>
+
+            <div class="grupo-campo">
+                <label for="responsavel" class="rotulo-campo">Responsável *</label>
+                <input type="text" id="responsavel" class="entrada-dados" placeholder="Ex: Seu Nome">
+                <div id="erro-responsavel" class="mensagem-erro"></div>
+            </div>
+
+            <div class="grupo-campo">
+                <label for="dataTermino" class="rotulo-campo">Data de Término *</label>
+                <input type="date" id="dataTermino" class="entrada-dados">
+                <div id="erro-dataTermino" class="mensagem-erro"></div>
+            </div>
+
+            <div class="grupo-campo">
+                <label for="detalhamento" class="rotulo-campo">Detalhamento</label>
+                <textarea id="detalhamento" class="entrada-dados" rows="4" placeholder="Detalhes opcionais..."></textarea>
+            </div>
+
+            <div class="area-botoes">
+                <a href="index.html" class="botao botao-cancelar">Cancelar</a>
+                <button type="submit" class="botao botao-salvar">Salvar</button>
+            </div>
+        </form>
+    </div>
+
+    <footer class="rodape-fixo">
+        Miguel Luiz Lima Nascimento / Tayná Araújo Bispo / Turma TADS 3B - DW / 2025
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api/tarefas';
+        
+        // Verifica se tem um ID na URL (significa que é ALTERAÇÃO)
+        const params = new URLSearchParams(window.location.search);
+        const idTarefa = params.get('id');
+
+        // Se tiver ID, muda o título e carrega os dados
+        if (idTarefa) {
+            document.getElementById('tituloTela').innerText = 'Alterar Tarefa';
+            carregarDadosParaEdicao(idTarefa);
+        }
+
+        async function carregarDadosParaEdicao(id) {
+            try {
+                const resp = await fetch(`${API_URL}/${id}`);
+                if(!resp.ok) throw new Error("Erro ao buscar");
+                const tarefa = await resp.json();
+
+                // Preenche os campos com os dados do banco
+                document.getElementById('titulo').value = tarefa.titulo;
+                document.getElementById('responsavel').value = tarefa.responsavel;
+                document.getElementById('dataTermino').value = tarefa.dataTermino;
+                document.getElementById('detalhamento').value = tarefa.detalhamento || ''; // Se for null, põe vazio
+            } catch (erro) {
+                alert("Erro ao carregar tarefa para edição.");
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Ao clicar em Salvar
+        document.getElementById('formularioTarefa').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Não recarrega a página
+
+            // Limpa mensagens de erro antigas
+            limparErros();
+
+            // Monta o Objeto JSON
+            const tarefaDTO = {
+                titulo: document.getElementById('titulo').value,
+                responsavel: document.getElementById('responsavel').value,
+                dataTermino: document.getElementById('dataTermino').value,
+                detalhamento: document.getElementById('detalhamento').value
+            };
+
+            const metodo = idTarefa ? 'PUT' : 'POST'; // Se tem ID é PUT (Alterar), senão é POST (Incluir)
+            const url = idTarefa ? `${API_URL}/${idTarefa}` : API_URL;
+
+            try {
+                const resposta = await fetch(url, {
+                    method: metodo,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tarefaDTO)
+                });
+
+                if (resposta.ok) {
+                    alert('Tarefa salva com sucesso!');
+                    window.location.href = 'index.html'; // Volta para a listagem
+                } else if (resposta.status === 400) {
+                    // Erro de Validação (Campos vazios)
+                    // Como não configuramos o retorno detalhado de erro no Spring ainda,
+                    // vamos mostrar um alerta genérico ou tratar se você quiser avançar nisso.
+                    alert('Verifique os campos obrigatórios!');
+                } else {
+                    alert('Erro ao salvar.');
+                }
+            } catch (erro) {
+                alert('Erro de conexão com o servidor.');
+            }
+        });
+
+        function limparErros() {
+            // Lógica simples para limpar textos de erro, se houver
+            document.querySelectorAll('.mensagem-erro').forEach(el => el.innerText = '');
+        }
+    </script>
+
+</body>
+</html>
