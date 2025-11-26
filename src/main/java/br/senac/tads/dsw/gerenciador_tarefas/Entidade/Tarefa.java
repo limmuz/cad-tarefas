@@ -1,4 +1,4 @@
-package br.senac.tads.dsw.gerenciador_tarefas.Entidade; // Ajuste se seu pacote for diferente
+package br.senac.tads.dsw.gerenciador_tarefas.Entidade;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,25 +8,25 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import lombok.Data; // Import do Lombok
+import lombok.Data;
 
-@Data // Aqui o LOMBOK está gerando os Getters, Setters, toString, equals, etc. automaticamente.
-@Entity // JPA: Avisa que essa classe é uma tabela no banco.
-@Table(name = "tarefa") // JPA está definindo o nome da tabela.
+@Data
+@Entity
+@Table(name = "tarefa")
 public class Tarefa {
 
-    @Id // JPA: Chave primária (PK).
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // JPA: Auto-increment (1, 2, 3...).
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank(message = "O título é obrigatório") // Aqui é onde ocorre a validação, informando ao código que não deve receber valor vazio.
+    @NotBlank(message = "O título é obrigatório")
     private String titulo;
 
     @NotBlank(message = "O responsável é obrigatório")
     private String responsavel;
 
-    @NotNull(message = "A data de término é obrigatória") // Use NotNull para datas (NotBlank é só para String).
+    @NotNull(message = "A data de término é obrigatória")
     private LocalDate dataTermino;
 
-    private String detalhamento; // Opcional, sem validação.
+    private String detalhamento;
 }

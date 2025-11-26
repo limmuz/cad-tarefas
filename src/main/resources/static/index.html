@@ -5,19 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciador de Tarefas</title>
     <style>
-        /* --- CSS MANUAL (ESTILO GERAL) --- */
-        /* Mesmo estilo base do form.html para manter consistência */
         
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
             margin: 0;
-            padding-bottom: 60px; /* Espaço para o rodapé */
+            padding-bottom: 60px;
         }
 
         .container-principal {
             width: 90%;
-            max-width: 800px; /* Um pouco mais largo que o form para caber a lista */
+            max-width: 800px;
             margin: 40px auto;
             background-color: white;
             padding: 20px;
@@ -31,11 +29,10 @@
             margin-bottom: 30px;
         }
 
-        /* --- ESTILOS ESPECÍFICOS DA LISTAGEM --- */
 
         .area-topo {
             display: flex;
-            justify-content: flex-end; /* Joga o botão para a direita */
+            justify-content: flex-end;
             margin-bottom: 20px;
         }
 
@@ -51,18 +48,18 @@
         }
 
         .botao-incluir {
-            background-color: #007bff; /* Azul */
+            background-color: #007bff;
             color: white;
         }
 
         .botao-alterar {
-            background-color: #6c757d; /* Cinza */
+            background-color: #6c757d;
             color: white;
             margin-right: 5px;
         }
 
         .botao-excluir {
-            background-color: #dc3545; /* Vermelho */
+            background-color: #dc3545;
             color: white;
         }
 
@@ -70,10 +67,9 @@
             opacity: 0.9;
         }
 
-        /* Estilo dos Cartões de Tarefa */
         .lista-tarefas {
             display: grid;
-            grid-template-columns: 1fr; /* Uma coluna por linha */
+            grid-template-columns: 1fr;
             gap: 15px;
         }
 
@@ -83,13 +79,12 @@
             padding: 15px;
             background-color: #fff;
             display: flex;
-            justify-content: space-between; /* Separa texto dos botões */
+            justify-content: space-between;
             align-items: center;
         }
 
-        /* Estilo para Tarefas Atrasadas (Borda e Fundo Vermelho Claro) */
         .cartao-atrasado {
-            border-left: 5px solid #dc3545; /* Borda grossa vermelha na esquerda */
+            border-left: 5px solid #dc3545;
             background-color: #fff5f5;
         }
 
@@ -117,13 +112,13 @@
 
         .acoes-tarefa {
             display: flex;
-            flex-direction: column; /* Botões um embaixo do outro em telas pequenas */
+            flex-direction: column;
             gap: 5px;
         }
         
         @media (min-width: 600px) {
             .acoes-tarefa {
-                flex-direction: row; /* Botões lado a lado em telas maiores */
+                flex-direction: row;
             }
         }
 
@@ -134,7 +129,6 @@
             margin-top: 20px;
         }
 
-        /* Rodapé Fixo */
         .rodape-fixo {
             position: fixed;
             bottom: 0;
@@ -174,31 +168,27 @@
                 
                 const tarefas = await resposta.json();
                 const divLista = document.getElementById('containerLista');
-                divLista.innerHTML = ''; // Limpa o "Carregando..."
+                divLista.innerHTML = '';
 
                 if (tarefas.length === 0) {
                     divLista.innerHTML = '<p class="mensagem-vazia">Nenhuma tarefa cadastrada.</p>';
                     return;
                 }
 
-                // Pega a data de hoje (zerando horas para comparar só o dia)
                 const hoje = new Date();
                 hoje.setHours(0,0,0,0);
 
                 tarefas.forEach(tarefa => {
-                    // Cria o HTML de cada tarefa
                     const dataTermino = new Date(tarefa.dataTermino + 'T00:00:00');
                     
                     let classeExtra = '';
                     let htmlTagAtraso = '';
 
-                    // Verifica se está atrasada
                     if (dataTermino < hoje) {
                         classeExtra = 'cartao-atrasado';
                         htmlTagAtraso = '<span class="tag-atrasada">ATRASADA</span>';
                     }
 
-                    // Formata a data para PT-BR
                     const dataFormatada = dataTermino.toLocaleDateString('pt-BR');
 
                     const htmlCartao = `
@@ -229,7 +219,7 @@
                     const resposta = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
                     if (resposta.ok) {
                         alert('Tarefa excluída!');
-                        carregarTarefas(); // Recarrega a lista
+                        carregarTarefas();
                     } else {
                         alert('Erro ao excluir.');
                     }
@@ -239,7 +229,6 @@
             }
         }
 
-        // Carrega a lista ao abrir a página
         carregarTarefas();
     </script>
 
